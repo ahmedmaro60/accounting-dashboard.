@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام محاسبة الشركة</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #34495e;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .nav-tab {
+            background: none;
+            border: none;
+            color: white;
+            padding: 15px 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 1rem;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .nav-tab.active {
+            background: #3498db;
+            border-bottom-color: #f39c12;
+        }
+
+        .content {
+            padding: 30px;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        .card.revenue {
+            border-left-color: #27ae60;
+        }
+
+        .card.expense {
+            border-left-color: #e74c3c;
+        }
+
+        .card.advance {
+            border-left-color: #f39c12;
+        }
+
+        .card.depreciation {
+            border-left-color: #9b59b6;
+        }
+
+        .card h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .card .amount {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+
+        .form-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            box-shadow: 0 4px 15px rgba(231, 76, 60, 0.3);
+        }
+
+        .btn-danger:hover {
+            box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+        }
+
+        .transaction-list {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.3s ease;
+        }
+
+        .transaction-item:hover {
+            background: #f8f9fa;
+        }
+
+        .transaction-item:last-child {
+            border-bottom: none;
+        }
+
+        .transaction-info {
+            flex-grow: 1;
+        }
+
+        .transaction-type {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .transaction-description {
+            color: #7f8c8d;
+            font-size: 0.9rem;
+        }
+
+        .transaction-date {
+            color: #95a5a6;
+            font-size: 0.85rem;
+        }
+
+        .transaction-amount {
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-left: 15px;
+        }
+
+        .amount-positive {
+            color: #27ae60;
+        }
+
+        .amount-negative {
+            color: #e74c3c;
+        }
+
+        .delete-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            margin-right: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .delete-btn:hover {
+            background: #c0392b;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        .summary-card h4 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .summary-card .value {
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .nav-tabs {
+                flex-direction: column;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏢 نظام محاسبة الشركة</h1>
+            <p>إدارة مالية شاملة وبسيطة</p>
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="showTab('dashboard')">📊 لوحة التحكم</button>
+            <button class="nav-tab" onclick="showTab('revenue')">💰 الإيرادات</button>
+            <button class="nav-tab" onclick="showTab('expenses')">💸 المصروفات</button>
+            <button class="nav-tab" onclick="showTab('advances')">🏦 السلف</button>
+            <button class="nav-tab" onclick="showTab('depreciation')">📉 الاستهلاك</button>
+            <button class="nav-tab" onclick="showTab('reports')">📋 التقارير</button>
+        </div>
+
+        <div class="content">
+            <!-- لوحة التحكم -->
+            <div id="dashboard" class="tab-content active">
+                <h2 style="color: #2c3e50; margin-bottom: 25px; text-align: center;">📊 لوحة التحكم الرئيسية</h2>
+                
+                <div class="dashboard">
+                    <div class="card revenue">
+                        <h3>💰 إجمالي الإيرادات</h3>
+                        <div class="amount" id="totalRevenue">0 ج.م</div>
+                    </div>
+                    
+                    <div class="card expense">
+                        <h3>💸 إجمالي المصروفات</h3>
+                        <div class="amount" id="totalExpenses">0 ج.م</div>
+                    </div>
+                    
+                    <div class="card advance">
+                        <h3>🏦 إجمالي السلف</h3>
+                        <div class="amount" id="totalAdvances">0 ج.م</div>
+                    </div>
+                    
+                    <div class="card depreciation">
+                        <h3>📉 إجمالي الاستهلاك</h3>
+                        <div class="amount" id="totalDepreciation">0 ج.م</div>
+                    </div>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h4>💹 صافي الربح</h4>
+                        <div class="value" id="netProfit">0 ج.م</div>
+                    </div>
+                    <div class="summary-card">
+                        <h4>💳 الرصيد المتاح</h4>
+                        <div class="value" id="availableBalance">0 ج.م</div>
+                    </div>
+                </div>
+
+                <div class="transaction-list" style="margin-top: 30px;">
+                    <h3 style="margin-bottom: 20px; color: #2c3e50;">📋 آخر العمليات</h3>
+                    <div id="recentTransactions">
+                        <p style="text-align: center; color: #7f8c8d;">لا توجد عمليات حتى الآن</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الإيرادات -->
+            <div id="revenue" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #27ae60; margin-bottom: 20px;">💰 إضافة إيراد جديد</h2>
+                    <form id="revenueForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="revenueAmount">المبلغ (ج.م)</label>
+                                <input type="number" id="revenueAmount" required min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="revenueDate">التاريخ</label>
+                                <input type="date" id="revenueDate" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="revenueDescription">الوصف</label>
+                            <textarea id="revenueDescription" rows="3" placeholder="وصف مصدر الإيراد..."></textarea>
+                        </div>
+                        <button type="submit" class="btn">إضافة الإيراد</button>
+                        <button type="button" class="btn" onclick="testRevenue()" style="background: #27ae60; margin-right: 10px;">اختبار سريع</button>
+                    </form>
+                </div>
+
+                <div class="transaction-list">
+                    <h3 style="color: #27ae60; margin-bottom: 20px;">📋 قائمة الإيرادات</h3>
+                    <div id="revenueList">
+                        <p style="text-align: center; color: #7f8c8d;">لا توجد إيرادات مسجلة</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- المصروفات -->
+            <div id="expenses" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #e74c3c; margin-bottom: 20px;">💸 إضافة مصروف جديد</h2>
+                    <form id="expenseForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expenseAmount">المبلغ (ج.م)</label>
+                                <input type="number" id="expenseAmount" required min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseDate">التاريخ</label>
+                                <input type="date" id="expenseDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="expenseCategory">الفئة</label>
+                                <select id="expenseCategory" required>
+                                    <option value="">اختر الفئة</option>
+                                    <option value="office">مصروفات مكتبية</option>
+                                    <option value="rent">إيجار</option>
+                                    <option value="utilities">مرافق</option>
+                                    <option value="transport">مواصلات</option>
+                                    <option value="maintenance">صيانة</option>
+                                    <option value="other">أخرى</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="expenseDescription">الوصف</label>
+                            <textarea id="expenseDescription" rows="3" placeholder="تفاصيل المصروف..."></textarea>
+                        </div>
+                        <button type="submit" class="btn">إضافة المصروف</button>
+                    </form>
+                </div>
+
+                <div class="transaction-list">
+                    <h3 style="color: #e74c3c; margin-bottom: 20px;">📋 قائمة المصروفات</h3>
+                    <div id="expenseList">
+                        <p style="text-align: center; color: #7f8c8d;">لا توجد مصروفات مسجلة</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- السلف -->
+            <div id="advances" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #f39c12; margin-bottom: 20px;">🏦 إدارة السلف</h2>
+                    <form id="advanceForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanceAmount">المبلغ (ج.م)</label>
+                                <input type="number" id="advanceAmount" required min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="advanceDate">التاريخ</label>
+                                <input type="date" id="advanceDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="advanceType">نوع العملية</label>
+                                <select id="advanceType" required>
+                                    <option value="">اختر نوع العملية</option>
+                                    <option value="given">سلفة معطاة</option>
+                                    <option value="returned">سلفة مستردة</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="advanceEmployee">الموظف</label>
+                                <input type="text" id="advanceEmployee" required placeholder="اسم الموظف">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="advanceDescription">الوصف</label>
+                            <textarea id="advanceDescription" rows="3" placeholder="تفاصيل السلفة..."></textarea>
+                        </div>
+                        <button type="submit" class="btn">تسجيل العملية</button>
+                    </form>
+                </div>
+
+                <div class="transaction-list">
+                    <h3 style="color: #f39c12; margin-bottom: 20px;">📋 قائمة السلف</h3>
+                    <div id="advanceList">
+                        <p style="text-align: center; color: #7f8c8d;">لا توجد سلف مسجلة</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- الاستهلاك -->
+            <div id="depreciation" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #9b59b6; margin-bottom: 20px;">📉 تسجيل الاستهلاك</h2>
+                    <form id="depreciationForm">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="depreciationAmount">مبلغ الاستهلاك (ج.م)</label>
+                                <input type="number" id="depreciationAmount" required min="0" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="depreciationDate">التاريخ</label>
+                                <input type="date" id="depreciationDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="assetName">اسم الأصل</label>
+                                <input type="text" id="assetName" required placeholder="اسم الأصل المستهلك">
+                            </div>
+                            <div class="form-group">
+                                <label for="depreciationMethod">طريقة الاستهلاك</label>
+                                <select id="depreciationMethod" required>
+                                    <option value="">اختر الطريقة</option>
+                                    <option value="straight">القسط الثابت</option>
+                                    <option value="declining">القسط المتناقص</option>
+                                    <option value="units">وحدات الإنتاج</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="depreciationDescription">ملاحظات</label>
+                            <textarea id="depreciationDescription" rows="3" placeholder="تفاصيل إضافية..."></textarea>
+                        </div>
+                        <button type="submit" class="btn">تسجيل الاستهلاك</button>
+                    </form>
+                </div>
+
+                <div class="transaction-list">
+                    <h3 style="color: #9b59b6; margin-bottom: 20px;">📋 قائمة الاستهلاك</h3>
+                    <div id="depreciationList">
+                        <p style="text-align: center; color: #7f8c8d;">لا يوجد استهلاك مسجل</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- التقارير -->
+            <div id="reports" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #34495e; margin-bottom: 20px;">📋 التقارير المالية</h2>
+                    
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>💰 إجمالي الإيرادات</h4>
+                            <div class="value amount-positive" id="reportRevenue">0 ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>💸 إجمالي المصروفات</h4>
+                            <div class="value amount-negative" id="reportExpenses">0 ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>🏦 إجمالي السلف المعطاة</h4>
+                            <div class="value" id="reportAdvancesGiven">0 ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>💼 إجمالي السلف المستردة</h4>
+                            <div class="value" id="reportAdvancesReturned">0 ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>📉 إجمالي الاستهلاك</h4>
+                            <div class="value amount-negative" id="reportDepreciation">0 ج.م</div>
+                        </div>
+                        <div class="summary-card" style="grid-column: 1 / -1; background: linear-gradient(135deg, #2c3e50, #3498db); color: white;">
+                            <h4>💹 صافي الربح/الخسارة</h4>
+                            <div class="value" id="reportNetProfit">0 ج.م</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-section">
+                    <h3 style="color: #2c3e50; margin-bottom: 15px;">🗓️ تقرير شهري</h3>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="reportMonth">الشهر والسنة</label>
+                            <input type="month" id="reportMonth">
+                        </div>
+                        <div class="form-group" style="display: flex; align-items: end;">
+                            <button class="btn" onclick="generateMonthlyReport()">إنشاء التقرير</button>
+                        </div>
+                    </div>
+                    <div id="monthlyReportResult"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // بيانات التطبيق
+        let data = {
+            revenue: [],
+            expenses: [],
+            advances: [],
+            depreciation: []
+        };
+
+        // إعداد التاريخ الافتراضي
+        function setDefaultDate() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('revenueDate').value = today;
+            document.getElementById('expenseDate').value = today;
+            document.getElementById('advanceDate').value = today;
+            document.getElementById('depreciationDate').value = today;
+        }
+
+        // تبديل التبويبات
+        function showTab(tabName) {
+            // إخفاء جميع التبويبات
+            const tabs = document.querySelectorAll('.tab-content');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // إزالة الحالة النشطة من جميع الأزرار
+            const navTabs = document.querySelectorAll('.nav-tab');
+            navTabs.forEach(tab => tab.classList.remove('active'));
+            
+            // إظهار التبويب المحدد
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+            
+            // تحديث التقارير عند فتح تبويب التقارير
+            if (tabName === 'reports') {
+                updateReports();
+            }
+            
+            // تحديث لوحة التحكم
+            if (tabName === 'dashboard') {
+                updateDashboard();
+            }
+        }
+
+        // إضافة إيراد
+        document.getElementById('revenueForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('revenueAmount').value);
+            const date = document.getElementById('revenueDate').value;
+            const description = document.getElementById('revenueDescription').value;
+            
+            const revenue = {
+                id: Date.now(),
+                amount: amount,
+                date: date,
+                description: description,
+                type: 'revenue'
+            };
+            
+            data.revenue.push(revenue);
+            updateRevenueList();
+            updateDashboard();
+            this.reset();
+            setDefaultDate();
+            
+            showNotification('تم إضافة الإيراد بنجاح!', 'success');
+        });
+
+        // إضافة مصروف
+        document.getElementById('expenseForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('expenseAmount').value);
+            const date = document.getElementById('expenseDate').value;
+            const category = document.getElementById('expenseCategory').value;
+            const description = document.getElementById('expenseDescription').value;
+            
+            const expense = {
+                id: Date.now(),
+                amount: amount,
+                date: date,
+                category: category,
+                description: description,
+                type: 'expense'
+            };
+            
+            data.expenses.push(expense);
+            updateExpenseList();
+            updateDashboard();
+            this.reset();
+            setDefaultDate();
+            
+            showNotification('تم إضافة المصروف بنجاح!', 'success');
+        });
+
+        // إضافة سلفة
+        document.getElementById('advanceForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('advanceAmount').value);
+            const date = document.getElementById('advanceDate').value;
+            const type = document.getElementById('advanceType').value;
+            const employee = document.getElementById('advanceEmployee').value;
+            const description = document.getElementById('advanceDescription').value;
+            
+            const advance = {
+                id: Date.now(),
+                amount: amount,
+                date: date,
+                advanceType: type,
+                employee: employee,
+                description: description,
+                type: 'advance'
+            };
+            
+            data.advances.push(advance);
+            updateAdvanceList();
+            updateDashboard();
+            this.reset();
+            setDefaultDate();
+            
+            showNotification('تم تسجيل السلفة بنجاح!', 'success');
+        });
+
+        // إضافة استهلاك
+        document.getElementById('depreciationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const amount = parseFloat(document.getElementById('depreciationAmount').value);
+            const date = document.getElementById('depreciationDate').value;
+            const assetName = document.getElementById('assetName').value;
+            const method = document.getElementById('depreciationMethod').value;
+            const description = document.getElementById('depreciationDescription').value;
+            
+            const depreciation = {
+                id: Date.now(),
+                amount: amount,
+                date: date,
+                assetName: assetName,
+                method: method,
+                description: description,
+                type: 'depreciation'
+            };
+            
+            data.depreciation.push(depreciation);
+            updateDepreciationList();
+            updateDashboard();
+            this.reset();
+            setDefaultDate();
+            
+            showNotification('تم تسجيل الاستهلاك بنجاح!', 'success');
+        });
+
+        // تحديث قائمة الإيرادات
+        function updateRevenueList() {
+            const container = document.getElementById('revenueList');
+            if (data.revenue.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">لا توجد إيرادات مسجلة</p>';
+                return;
+            }
+            
+            let html = '';
+            data.revenue.forEach(item => {
+                html += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">💰 إيراد</div>
+                            <div class="transaction-description">${item.description || 'بدون وصف'}</div>
+                            <div class="transaction-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="transaction-amount amount-positive">+${item.amount.toFixed(2)} ج.م</div>
+                        <button class="delete-btn" onclick="deleteItem('revenue', ${item.id})">حذف</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // تحديث قائمة المصروفات
+        function updateExpenseList() {
+            const container = document.getElementById('expenseList');
+            if (data.expenses.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">لا توجد مصروفات مسجلة</p>';
+                return;
+            }
+            
+            let html = '';
+            data.expenses.forEach(item => {
+                const categoryName = getCategoryName(item.category);
+                html += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">💸 ${categoryName}</div>
+                            <div class="transaction-description">${item.description || 'بدون وصف'}</div>
+                            <div class="transaction-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="transaction-amount amount-negative">-${item.amount.toFixed(2)} ج.م</div>
+                        <button class="delete-btn" onclick="deleteItem('expenses', ${item.id})">حذف</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // تحديث قائمة السلف
+        function updateAdvanceList() {
+            const container = document.getElementById('advanceList');
+            if (data.advances.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">لا توجد سلف مسجلة</p>';
+                return;
+            }
+            
+            let html = '';
+            data.advances.forEach(item => {
+                const typeText = item.advanceType === 'given' ? 'سلفة معطاة' : 'سلفة مستردة';
+                const amountClass = item.advanceType === 'given' ? 'amount-negative' : 'amount-positive';
+                const sign = item.advanceType === 'given' ? '-' : '+';
+                
+                html += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">🏦 ${typeText}</div>
+                            <div class="transaction-description">الموظف: ${item.employee}</div>
+                            <div class="transaction-description">${item.description || 'بدون وصف'}</div>
+                            <div class="transaction-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="transaction-amount ${amountClass}">${sign}${item.amount.toFixed(2)} ج.م</div>
+                        <button class="delete-btn" onclick="deleteItem('advances', ${item.id})">حذف</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // تحديث قائمة الاستهلاك
+        function updateDepreciationList() {
+            const container = document.getElementById('depreciationList');
+            if (data.depreciation.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">لا يوجد استهلاك مسجل</p>';
+                return;
+            }
+            
+            let html = '';
+            data.depreciation.forEach(item => {
+                const methodName = getDepreciationMethodName(item.method);
+                html += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">📉 استهلاك - ${item.assetName}</div>
+                            <div class="transaction-description">الطريقة: ${methodName}</div>
+                            <div class="transaction-description">${item.description || 'بدون وصف'}</div>
+                            <div class="transaction-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="transaction-amount amount-negative">-${item.amount.toFixed(2)} ج.م</div>
+                        <button class="delete-btn" onclick="deleteItem('depreciation', ${item.id})">حذف</button>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+        }
+
+        // تحديث لوحة التحكم
+        function updateDashboard() {
+            const totalRevenue = data.revenue.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = data.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalAdvancesGiven = data.advances.filter(item => item.advanceType === 'given').reduce((sum, item) => sum + item.amount, 0);
+            const totalAdvancesReturned = data.advances.filter(item => item.advanceType === 'returned').reduce((sum, item) => sum + item.amount, 0);
+            const totalDepreciation = data.depreciation.reduce((sum, item) => sum + item.amount, 0);
+            
+            const netAdvances = totalAdvancesGiven - totalAdvancesReturned;
+            const netProfit = totalRevenue - totalExpenses - totalDepreciation;
+            const availableBalance = netProfit - netAdvances;
+
+            document.getElementById('totalRevenue').textContent = `${totalRevenue.toFixed(2)} ج.م`;
+            document.getElementById('totalExpenses').textContent = `${totalExpenses.toFixed(2)} ج.م`;
+            document.getElementById('totalAdvances').textContent = `${netAdvances.toFixed(2)} ج.م`;
+            document.getElementById('totalDepreciation').textContent = `${totalDepreciation.toFixed(2)} ج.م`;
+            document.getElementById('netProfit').textContent = `${netProfit.toFixed(2)} ج.م`;
+            document.getElementById('availableBalance').textContent = `${availableBalance.toFixed(2)} ج.م`;
+
+            // تحديث آخر العمليات
+            updateRecentTransactions();
+        }
+
+        // تحديث آخر العمليات
+        function updateRecentTransactions() {
+            const container = document.getElementById('recentTransactions');
+            let allTransactions = [];
+            
+            // جمع جميع العمليات
+            data.revenue.forEach(item => allTransactions.push({...item, category: 'revenue'}));
+            data.expenses.forEach(item => allTransactions.push({...item, category: 'expense'}));
+            data.advances.forEach(item => allTransactions.push({...item, category: 'advance'}));
+            data.depreciation.forEach(item => allTransactions.push({...item, category: 'depreciation'}));
+            
+            // ترتيب حسب التاريخ
+            allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // أخذ آخر 5 عمليات
+            const recentTransactions = allTransactions.slice(0, 5);
+            
+            if (recentTransactions.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #7f8c8d;">لا توجد عمليات حتى الآن</p>';
+                return;
+            }
+            
+            let html = '';
+            recentTransactions.forEach(item => {
+                let typeText = '';
+                let amountClass = '';
+                let sign = '';
+                
+                switch(item.category) {
+                    case 'revenue':
+                        typeText = '💰 إيراد';
+                        amountClass = 'amount-positive';
+                        sign = '+';
+                        break;
+                    case 'expense':
+                        typeText = `💸 ${getCategoryName(item.category)}`;
+                        amountClass = 'amount-negative';
+                        sign = '-';
+                        break;
+                    case 'advance':
+                        typeText = `🏦 ${item.advanceType === 'given' ? 'سلفة معطاة' : 'سلفة مستردة'}`;
+                        amountClass = item.advanceType === 'given' ? 'amount-negative' : 'amount-positive';
+                        sign = item.advanceType === 'given' ? '-' : '+';
+                        break;
+                    case 'depreciation':
+                        typeText = `📉 استهلاك - ${item.assetName}`;
+                        amountClass = 'amount-negative';
+                        sign = '-';
+                        break;
+                }
+                
+                html += `
+                    <div class="transaction-item">
+                        <div class="transaction-info">
+                            <div class="transaction-type">${typeText}</div>
+                            <div class="transaction-description">${item.description || 'بدون وصف'}</div>
+                            <div class="transaction-date">${formatDate(item.date)}</div>
+                        </div>
+                        <div class="transaction-amount ${amountClass}">${sign}${item.amount.toFixed(2)} ج.م</div>
+                    </div>
+                `;
+            });
+            
+            container.innerHTML = html;
+        }
+
+        // تحديث التقارير
+        function updateReports() {
+            const totalRevenue = data.revenue.reduce((sum, item) => sum + item.amount, 0);
+            const totalExpenses = data.expenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalAdvancesGiven = data.advances.filter(item => item.advanceType === 'given').reduce((sum, item) => sum + item.amount, 0);
+            const totalAdvancesReturned = data.advances.filter(item => item.advanceType === 'returned').reduce((sum, item) => sum + item.amount, 0);
+            const totalDepreciation = data.depreciation.reduce((sum, item) => sum + item.amount, 0);
+            const netProfit = totalRevenue - totalExpenses - totalDepreciation;
+
+            document.getElementById('reportRevenue').textContent = `${totalRevenue.toFixed(2)} ج.م`;
+            document.getElementById('reportExpenses').textContent = `${totalExpenses.toFixed(2)} ج.م`;
+            document.getElementById('reportAdvancesGiven').textContent = `${totalAdvancesGiven.toFixed(2)} ج.م`;
+            document.getElementById('reportAdvancesReturned').textContent = `${totalAdvancesReturned.toFixed(2)} ج.م`;
+            document.getElementById('reportDepreciation').textContent = `${totalDepreciation.toFixed(2)} ج.م`;
+            document.getElementById('reportNetProfit').textContent = `${netProfit.toFixed(2)} ج.م`;
+        }
+
+        // حذف عنصر
+        function deleteItem(category, id) {
+            if (confirm('هل أنت متأكد من حذف هذا العنصر؟')) {
+                const index = data[category].findIndex(item => item.id === id);
+                if (index > -1) {
+                    data[category].splice(index, 1);
+                    
+                    // تحديث القوائم
+                    switch(category) {
+                        case 'revenue':
+                            updateRevenueList();
+                            break;
+                        case 'expenses':
+                            updateExpenseList();
+                            break;
+                        case 'advances':
+                            updateAdvanceList();
+                            break;
+                        case 'depreciation':
+                            updateDepreciationList();
+                            break;
+                    }
+                    
+                    updateDashboard();
+                    showNotification('تم حذف العنصر بنجاح!', 'success');
+                }
+            }
+        }
+
+        // تنسيق التاريخ
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('ar-EG', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+        }
+
+        // الحصول على اسم الفئة
+        function getCategoryName(category) {
+            const categories = {
+                'office': 'مصروفات مكتبية',
+                'rent': 'إيجار',
+                'utilities': 'مرافق',
+                'transport': 'مواصلات',
+                'maintenance': 'صيانة',
+                'other': 'أخرى'
+            };
+            return categories[category] || 'غير محدد';
+        }
+
+        // الحصول على اسم طريقة الاستهلاك
+        function getDepreciationMethodName(method) {
+            const methods = {
+                'straight': 'القسط الثابت',
+                'declining': 'القسط المتناقص',
+                'units': 'وحدات الإنتاج'
+            };
+            return methods[method] || 'غير محدد';
+        }
+
+        // إنشاء تقرير شهري
+        function generateMonthlyReport() {
+            const monthInput = document.getElementById('reportMonth').value;
+            if (!monthInput) {
+                showNotification('يرجى اختيار الشهر والسنة', 'error');
+                return;
+            }
+            
+            const [year, month] = monthInput.split('-');
+            const startDate = new Date(year, month - 1, 1);
+            const endDate = new Date(year, month, 0);
+            
+            // تصفية البيانات للشهر المحدد
+            const monthlyRevenue = data.revenue.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const monthlyExpenses = data.expenses.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const monthlyAdvances = data.advances.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            const monthlyDepreciation = data.depreciation.filter(item => {
+                const itemDate = new Date(item.date);
+                return itemDate >= startDate && itemDate <= endDate;
+            });
+            
+            // حساب المجاميع
+            const totalMonthlyRevenue = monthlyRevenue.reduce((sum, item) => sum + item.amount, 0);
+            const totalMonthlyExpenses = monthlyExpenses.reduce((sum, item) => sum + item.amount, 0);
+            const totalMonthlyDepreciation = monthlyDepreciation.reduce((sum, item) => sum + item.amount, 0);
+            const netMonthlyProfit = totalMonthlyRevenue - totalMonthlyExpenses - totalMonthlyDepreciation;
+            
+            // إنشاء التقرير
+            const monthName = startDate.toLocaleDateString('ar-EG', { month: 'long', year: 'numeric' });
+            
+            let reportHtml = `
+                <div class="form-section" style="margin-top: 20px;">
+                    <h4 style="color: #2c3e50; margin-bottom: 15px;">📊 تقرير شهر ${monthName}</h4>
+                    <div class="summary-grid">
+                        <div class="summary-card">
+                            <h4>💰 الإيرادات</h4>
+                            <div class="value amount-positive">${totalMonthlyRevenue.toFixed(2)} ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>💸 المصروفات</h4>
+                            <div class="value amount-negative">${totalMonthlyExpenses.toFixed(2)} ج.م</div>
+                        </div>
+                        <div class="summary-card">
+                            <h4>📉 الاستهلاك</h4>
+                            <div class="value amount-negative">${totalMonthlyDepreciation.toFixed(2)} ج.م</div>
+                        </div>
+                        <div class="summary-card" style="background: linear-gradient(135deg, #2c3e50, #3498db); color: white;">
+                            <h4>💹 صافي الربح</h4>
+                            <div class="value">${netMonthlyProfit.toFixed(2)} ج.م</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.getElementById('monthlyReportResult').innerHTML = reportHtml;
+        }
+
+        // إظهار الإشعارات
+        function showNotification(message, type) {
+            // إنشاء عنصر الإشعار
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 25px;
+                border-radius: 10px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s ease-out;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            `;
+            
+            if (type === 'success') {
+                notification.style.background = 'linear-gradient(135deg, #27ae60, #2ecc71)';
+            } else {
+                notification.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)';
+            }
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // إزالة الإشعار بعد 3 ثوان
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease-out';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // إضافة CSS للتحريك
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+            }
+            
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
+                }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // تهيئة التطبيق عند التحميل
+        window.onload = function() {
+            setDefaultDate();
+            updateDashboard();
+            
+            // دالة اختبار سريع للإيرادات
+        function testRevenue() {
+            console.log('اختبار سريع للإيرادات...');
+            
+            const testRevenue = {
+                id: Date.now(),
+                amount: 1000,
+                date: new Date().toISOString().split('T')[0],
+                description: 'إيراد تجريبي للاختبار',
+                type: 'revenue'
+            };
+            
+            data.revenue.push(testRevenue);
+            console.log('تم إضافة إيراد تجريبي:', testRevenue);
+            console.log('إجمالي الإيرادات الآن:', data.revenue.length);
+            
+            updateRevenueList();
+            updateDashboard();
+            
+            showNotification('✅ تم إضافة إيراد تجريبي بقيمة 1000 ج.م!', 'success');
+        }
+
+        // إعداد معالجات الأحداث بشكل مباشر
+            setupEventListeners();
+        };
+
+        // إعداد معالجات الأحداث
+        function setupEventListeners() {
+            // معالج تسجيل الإيرادات
+            const revenueForm = document.getElementById('revenueForm');
+            if (revenueForm) {
+                revenueForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    console.log('تسجيل إيراد...');
+                    
+                    const amount = parseFloat(document.getElementById('revenueAmount').value);
+                    const date = document.getElementById('revenueDate').value;
+                    const description = document.getElementById('revenueDescription').value;
+                    
+                    console.log('البيانات:', { amount, date, description });
+                    
+                    if (!amount || amount <= 0) {
+                        showNotification('يرجى إدخال مبلغ صحيح', 'error');
+                        return;
+                    }
+                    
+                    if (!date) {
+                        showNotification('يرجى اختيار التاريخ', 'error');
+                        return;
+                    }
+                    
+                    const revenue = {
+                        id: Date.now(),
+                        amount: amount,
+                        date: date,
+                        description: description || 'بدون وصف',
+                        type: 'revenue'
+                    };
+                    
+                    console.log('الإيراد الجديد:', revenue);
+                    
+                    data.revenue.push(revenue);
+                    console.log('إجمالي الإيرادات:', data.revenue.length);
+                    
+                    updateRevenueList();
+                    updateDashboard();
+                    revenueForm.reset();
+                    setDefaultDate();
+                    
+                    showNotification('✅ تم إضافة الإيراد بنجاح!', 'success');
+                };
+            }
+            
+            // معالج تسجيل المصروفات
+            const expenseForm = document.getElementById('expenseForm');
+            if (expenseForm) {
+                expenseForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    console.log('تسجيل مصروف...');
+                    
+                    const amount = parseFloat(document.getElementById('expenseAmount').value);
+                    const date = document.getElementById('expenseDate').value;
+                    const category = document.getElementById('expenseCategory').value;
+                    const description = document.getElementById('expenseDescription').value;
+                    
+                    if (!amount || amount <= 0) {
+                        showNotification('يرجى إدخال مبلغ صحيح', 'error');
+                        return;
+                    }
+                    
+                    if (!date) {
+                        showNotification('يرجى اختيار التاريخ', 'error');
+                        return;
+                    }
+                    
+                    if (!category) {
+                        showNotification('يرجى اختيار فئة المصروف', 'error');
+                        return;
+                    }
+                    
+                    const expense = {
+                        id: Date.now(),
+                        amount: amount,
+                        date: date,
+                        category: category,
+                        description: description || 'بدون وصف',
+                        type: 'expense'
+                    };
+                    
+                    data.expenses.push(expense);
+                    updateExpenseList();
+                    updateDashboard();
+                    expenseForm.reset();
+                    setDefaultDate();
+                    
+                    showNotification('✅ تم إضافة المصروف بنجاح!', 'success');
+                };
+            }
+            
+            // معالج تسجيل السلف
+            const advanceForm = document.getElementById('advanceForm');
+            if (advanceForm) {
+                advanceForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    console.log('تسجيل سلفة...');
+                    
+                    const amount = parseFloat(document.getElementById('advanceAmount').value);
+                    const date = document.getElementById('advanceDate').value;
+                    const type = document.getElementById('advanceType').value;
+                    const employee = document.getElementById('advanceEmployee').value;
+                    const description = document.getElementById('advanceDescription').value;
+                    
+                    if (!amount || amount <= 0) {
+                        showNotification('يرجى إدخال مبلغ صحيح', 'error');
+                        return;
+                    }
+                    
+                    if (!date) {
+                        showNotification('يرجى اختيار التاريخ', 'error');
+                        return;
+                    }
+                    
+                    if (!type) {
+                        showNotification('يرجى اختيار نوع العملية', 'error');
+                        return;
+                    }
+                    
+                    if (!employee.trim()) {
+                        showNotification('يرجى إدخال اسم الموظف', 'error');
+                        return;
+                    }
+                    
+                    const advance = {
+                        id: Date.now(),
+                        amount: amount,
+                        date: date,
+                        advanceType: type,
+                        employee: employee,
+                        description: description || 'بدون وصف',
+                        type: 'advance'
+                    };
+                    
+                    data.advances.push(advance);
+                    updateAdvanceList();
+                    updateDashboard();
+                    advanceForm.reset();
+                    setDefaultDate();
+                    
+                    showNotification('✅ تم تسجيل السلفة بنجاح!', 'success');
+                };
+            }
+            
+            // معالج تسجيل الاستهلاك
+            const depreciationForm = document.getElementById('depreciationForm');
+            if (depreciationForm) {
+                depreciationForm.onsubmit = function(e) {
+                    e.preventDefault();
+                    console.log('تسجيل استهلاك...');
+                    
+                    const amount = parseFloat(document.getElementById('depreciationAmount').value);
+                    const date = document.getElementById('depreciationDate').value;
+                    const assetName = document.getElementById('assetName').value;
+                    const method = document.getElementById('depreciationMethod').value;
+                    const description = document.getElementById('depreciationDescription').value;
+                    
+                    if (!amount || amount <= 0) {
+                        showNotification('يرجى إدخال مبلغ صحيح', 'error');
+                        return;
+                    }
+                    
+                    if (!date) {
+                        showNotification('يرجى اختيار التاريخ', 'error');
+                        return;
+                    }
+                    
+                    if (!assetName.trim()) {
+                        showNotification('يرجى إدخال اسم الأصل', 'error');
+                        return;
+                    }
+                    
+                    if (!method) {
+                        showNotification('يرجى اختيار طريقة الاستهلاك', 'error');
+                        return;
+                    }
+                    
+                    const depreciation = {
+                        id: Date.now(),
+                        amount: amount,
+                        date: date,
+                        assetName: assetName,
+                        method: method,
+                        description: description || 'بدون وصف',
+                        type: 'depreciation'
+                    };
+                    
+                    data.depreciation.push(depreciation);
+                    updateDepreciationList();
+                    updateDashboard();
+                    depreciationForm.reset();
+                    setDefaultDate();
+                    
+                    showNotification('✅ تم تسجيل الاستهلاك بنجاح!', 'success');
+                };
+            }
+        }
+    </script>
+</body>
+</html>
